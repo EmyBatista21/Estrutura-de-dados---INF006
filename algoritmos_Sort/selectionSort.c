@@ -1,15 +1,16 @@
 #include <stdio.h>
-#define tam 5
-
+#define tam 13
+// O(n^2)
 //gcc selectionSort.c -o selection
 void selectionSort(int vetor[]); 
 int main(void)
 {
-    int vetor[] = {8, 7, 5, 3, 1}; 
+    //int vetor[] = {8, 7, 5, 3, 1};
+    int vetor[] = {4, 4, 5, 8, 6, 2, 8, 4, 7, 5, 6, 0, -1};
     int menor, i;
     printf("Antes da ordenação - ");
     for(i = 0; i < tam; i++){
-        if(vetor[i] != vetor[tam - 1]){
+        if(i != tam - 1){
           printf("%d, ", vetor[i]);
         } else
           printf("%d", vetor[i]);
@@ -36,7 +37,7 @@ void selectionSort(int vetor[]){
     
     printf("\nDepois da ordenação - ");
     for(i = 0; i < tam; i++){
-        if(vetor[i] != vetor[tam - 1]){
+        if(i!= tam - 1){
           printf("%d, ", vetor[i]);
         } else
           printf("%d", vetor[i]);
