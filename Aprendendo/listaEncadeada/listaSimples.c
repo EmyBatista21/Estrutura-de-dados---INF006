@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-//gcc listaSimples.c -o simples -Wno-unused-result
+void limparComPause();
+// gcc listaSimples.c -o simples -Wno-unused-result
 
 typedef struct ponto{
   int x, y;
@@ -9,30 +11,64 @@ typedef struct ponto{
 }t_ponto;
 
 int main(void){
-  int resp;
+  int resp, op;
+  int sair = 0; 
+  int resetProx = 0;
   t_ponto *ini_ponto = NULL;
   t_ponto *prox_ponto = NULL;
   ini_ponto = (t_ponto*)malloc(sizeof(t_ponto));
   if(ini_ponto == NULL)
     exit(1);
   prox_ponto = ini_ponto;
-  while(1){
-    printf("Digite x:");
-    scanf("%d", &prox_ponto -> x);
-    printf("Digite y:");
-    scanf("%d", &prox_ponto -> y);
-    printf("Deseja continuar? <1> SIM <outro valor> NAO:\n");
-    scanf("%d", &resp);
-    if(resp == 1){
-      prox_ponto -> prox = (t_ponto*)malloc(sizeof(t_ponto));
-      prox_ponto = prox_ponto -> prox; 
-    }else
-      break; 
+  while(sair != 4){
+    printf("(1) - INSERIR  (3) - LISTAR  (4) - SAIR\n");
+    printf("Insira a opção: ");
+    scanf("%d", &op);
+    switch(op){
+      case 1:
+        while(1){
+          if(resetProx > 0){
+            prox_ponto = prox_ponto -> prox;
+          }
+          printf("Digite x:");
+          scanf("%d", &prox_ponto -> x);
+          printf("Digite y:");
+          scanf("%d", &prox_ponto -> y);
+          printf("Deseja continuar? <1> SIM <outro valor> NAO:\n");
+          scanf("%d", &resp);
+          if(resp == 1){
+            prox_ponto -> prox = (t_ponto*)malloc(sizeof(t_ponto));
+            prox_ponto = prox_ponto -> prox; 
+            resetProx = 0;
+          }else
+            break; 
+        }
+        limparComPause();
+        break;
+      case 2:
+        printf("Campo em construção...\n");
+        limparComPause();
+        break;
+      case 3:
+        prox_ponto -> prox = NULL;
+        prox_ponto = ini_ponto; 
+        resetProx++;
+        while(prox_ponto != NULL){
+          printf("x: %d, y: %d\n", prox_ponto -> x, prox_ponto -> y);
+          prox_ponto = prox_ponto -> prox; 
+        }  
+        limparComPause();
+        break;
+      case 4:
+        sair = 4; 
+        break; 
+    }
   }
-  prox_ponto -> prox = NULL;
-  prox_ponto = ini_ponto; 
-  while(prox_ponto != NULL){
-    printf("x: %d, y: %d\n", prox_ponto -> x, prox_ponto -> y);
-    prox_ponto = prox_ponto -> prox; 
-  }
+}
+
+void limparComPause(){
+  printf("Clique para voltar...\n");
+  getchar(); 
+  getchar();
+  system("clear || cls"); 
 }

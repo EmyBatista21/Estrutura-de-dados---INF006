@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-//gcc mercadoDeAcoes.c -o mercado -Wno-unused-result
+// gcc mercado.c -o mercado -Wno-unused-result
 //Menus
 int menuPrincipal(); 
 int menuOpCompras(); 
@@ -46,7 +46,7 @@ int main(void){
             if(ini_compra == NULL)
               exit(1); 
             prox_compra = ini_compra;
-            inserir_Compras(ini_compra, prox_compra);
+            inserir_Compras(&ini_compra, &prox_compra);
             limparComPause();
             break;
           }
@@ -98,13 +98,13 @@ void listar_compras(acoesCompra *ini_compra, acoesCompra *prox_compra){
   char nome[10] = "SemNome"; 
   prox_compra -> prox = NULL;
   prox_compra = ini_compra;
-  do{
+  while(prox_compra != NULL){
     printf("--------------------------------\n");
     printf("Nome       Valor      Quantidade\n");
     printf("%s    %.2f        %d\n", nome, prox_compra -> valorCompra, prox_compra -> qtdCompra);
     printf("--------------------------------\n");
     prox_compra = prox_compra -> prox; 
-    }while(prox_compra != NULL);
+    }
 }
 
 
