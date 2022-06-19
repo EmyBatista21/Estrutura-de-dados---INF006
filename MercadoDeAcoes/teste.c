@@ -1,454 +1,191 @@
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <stdio.h>
 
-#define MAX 5
-#define FORMATO ".bin"
+// gcc teste.c -o teste -Wno-unused-result
 
-typedef struct lista_compra_venda
+/*
+IFBA
+Disciplina: INF006 - Estrutura de dados
+Docente: Prof. Antônio Carlos
+Discente: Pedro Costa
+Semestre: 2021.1
+Atividade: Mercado simulado de compra e venda de ações
+Entrega parcial: 21/06/2021/ Resolução das letras a e b.
+*/
+
+//declaração de struct
+typedef struct ponto
 {
-    int qtd;
-    int valor;
-    char sigla[5];
-    struct lista_compra_venda *prox;
-
-} lista_compra_venda;
-
-typedef struct lista_empresa {
-
-    int cotacao;
-    char sigla[5];
-    struct lista_empresa *prox;
-
-} lista_empresa;
+	int quantidade;
+	float valor;
+	int tipo;//compra ou venda
+	int sigla;//título
+	struct ponto* proximo;//ponteiro para o próximo elemento
+	int resp;
+	
+}t_ponto;
 
 
-//Cria um nó "cabeca" sem dados, apenas apontando. Inicializa uma lista.
-lista_compra_venda * inicializa_lista_compra_venda (void){
-
-    lista_compra_venda * cabeca = malloc(sizeof(lista_compra_venda));
-    cabeca -> prox = NULL;
-
-    return cabeca;
-}
-
-lista_empresa * inicializa_lista_empresas (void){
-
-    lista_empresa * cabeca = malloc(sizeof(lista_empresa));
-    cabeca -> prox = NULL;
-
-    return cabeca;
-}
-
-void Limpa_stdin(void)
+int main(int argc, char const *argv[])
 {
-    int c = 0;
-    while ((c = getchar()) != '\n' && c != EOF) {}
-}
-
-//Insere item apos a cabeca
-int inserir_lista_acoes (lista_compra_venda *lista, lista_empresa *empresa, int qtd, int valor, char* sigla){
-
-    //Se existir...
-
-    int pesquisa = 1;
-    pesquisa = pesquisa_empresa(empresa, sigla);
-
-    if (pesquisa == 0){
-
-        inserir_empresa(empresa, sigla, 0);
-
-        lista_compra_venda *nova_lista_acoes = malloc(sizeof(lista_compra_venda)); //Criação do nó
-    
-        nova_lista_acoes->qtd = qtd;
-        nova_lista_acoes->valor = valor;
-        strcpy(nova_lista_acoes->sigla, sigla); 
-        nova_lista_acoes->prox = NULL;
-
-        while (lista->prox != NULL){
-            lista = lista->prox;
-        }
-        
-        lista->prox = nova_lista_acoes;
-
-        printf("%d\n", pesquisa);
-            
-    } else {
-
-        lista_compra_venda *nova_lista_acoes = malloc(sizeof(lista_compra_venda)); //Criação do nó
-    
-        nova_lista_acoes->qtd = qtd;
-        nova_lista_acoes->valor = valor;
-        strcpy(nova_lista_acoes->sigla, sigla); 
-        nova_lista_acoes->prox = NULL;
-
-        while (lista->prox != NULL){
-            lista = lista->prox;
-        }
-        
-        lista->prox = nova_lista_acoes;
-
-        printf("%d\n", pesquisa);
-    }   
-
-    return 0;
-}
-
-
-int inserir_empresa (lista_empresa *lista, char* sigla, int cotacao){
-
-    lista_empresa *nova_empresa = malloc(sizeof(lista_empresa)); //Criação do nó
-    
-    strcpy(nova_empresa->sigla, sigla);
-    nova_empresa->cotacao = cotacao;
-    nova_empresa->prox = NULL;
-
-    while (lista->prox != NULL){
-        lista = lista->prox;
-    }
-
-    lista->prox = nova_empresa;
-
-}
-
-int cotacao_empresa (lista_empresa * empresa, int cotacao, char* sigla){
-
-    int compara = 1;
-    
-    while(empresa->prox != NULL){
-
-        empresa = empresa->prox;
-        compara = strcmp(empresa->sigla, sigla);
-
-        if (compara == 0){
-            empresa->cotacao = cotacao;
-        }
-    }
-    return 0;
-}
-
-int excluir (lista_compra_venda *lista, int valor){
-
-    lista_compra_venda *temp = lista;
-    lista_compra_venda *anterior = NULL;
-
-    while (temp != NULL && temp->valor != valor){
-        anterior = temp;
-        temp = temp->prox;
-    }
-
-    if (temp == NULL){
-        return 1;
-    }
-
-    anterior->prox = temp->prox;
-
-    free(temp);
-    return 0;
-};
-
-
-int pesquisa_empresa (lista_empresa *empresa, char* sigla){
-
-    lista_empresa *temp = empresa;
-
-    while(temp != NULL){
-
-        if ( strcmp(temp->sigla, sigla) == 0){
-            return 1;
-        }
-
-        temp = temp->prox;
-    }
-
-}
-
-//Verifica se pode realizar compra/venda nas ações listadas
-void executa_compras_vendas (lista_compra_venda *lista_compra, lista_compra_venda *lista_venda, lista_empresa *empresa){
-
-    char* sigla;
-    int temp = 0;
-    int compara_siglas;
-
-    //Seleciona uma lista_acoes de compra...
-    while (lista_compra->prox != NULL){
-        lista_compra = lista_compra->prox;
-
-        //... e compara com todas as acoes de venda. Repete isso com todas as de compra.
-        while (lista_venda->prox){
-
-            lista_venda = lista_venda->prox;
-            compara_siglas = strcmp(lista_compra->sigla, lista_venda->sigla);
-
-            //Se existe uma ordem de compra e venda compativel e as siglas são iguais. Executa a operacoes.
-            if ( (lista_compra->valor == lista_venda->valor) && (compara_siglas) == 0 ){
-
-                //Seta a cotacao da empresa o ultimo preço de venda
-                cotacao_empresa(empresa, lista_venda->valor, lista_venda->sigla);
-                
-                //Abate a quantidade de papeis comprados/vendidos.
-                temp = lista_compra->qtd;
-                lista_compra->qtd = lista_compra->qtd - lista_venda->qtd;
-                lista_venda->qtd = lista_venda->qtd - temp;
-
-                // Se ficar 0 ou negativo, vai para -1.
-                if (lista_compra->qtd <= 0){
-                    lista_compra->valor = -1;
-                }
-                
-                if (lista_venda->qtd <= 0){
-                    lista_venda->valor = -1;
-                }
-
-                printf("Ordem realizada\n");
-                printf("\n");
-
-            }
-        }
-    }
-
-};
-
-//Lista a quantidade e valor de cada lista_acoes da empresa selecionada
-void exibir_acoes (lista_compra_venda *lista){
-    while (lista->prox != NULL){
-        lista = lista->prox;
-        printf("Sigla: %s\tR$ %d\tQuantidade: %d\t\n", lista->sigla, lista->valor, lista->qtd);
-    }
-}
-
-//Lista a cotacao de todas as empresas
-void exibir_empresas (lista_empresa *lista){
-    while (lista->prox != NULL){
-        lista = lista->prox;
-        if (lista->cotacao == 0){
-            printf("Sigla: %s\tSem dado da ultima cotacao\n", lista->sigla);
-        } else {
-            printf("Sigla: %s\tR$ %d\n", lista->sigla, lista->cotacao);
-        }
-    }
-}
-
-
-void salvar_acoes (lista_compra_venda *cabeca, char* nome_do_arquivo){
-
-    lista_compra_venda *atual = cabeca;
-    lista_compra_venda *temp = NULL;
-    FILE *pArquivo;
-
-    pArquivo = fopen(nome_do_arquivo, "wb");
-
-    if (pArquivo != NULL){
-
-        while (atual->prox != NULL){
-
-            //Devido a um dos item da struct ser um ponteiro, não podemos salvar ele no arquivo. Daria problemas carregar um ponteiro para algo que aponta para algo invalido.
-            //Entao salvamos o ponteiro para o proximo item temporariamente em outro lugar e salvamos os dados do arquivo com o ponteiro apontando para NULL.
-            //Depois de salvo, colocamos o ponteiro no lugar.
-
-            atual = atual->prox;
-            temp = atual->prox;
-
-            atual->prox = NULL;
-
-            fwrite(atual, 1, sizeof(lista_compra_venda), pArquivo);
-
-            atual->prox = temp;
-
-        }
-    
-        fclose(pArquivo);
-
-    } else {
-
-        printf("Nao foi possivel salvar o arquivo\n");
-
-    }
-
-}
-
-void salvar_empresas (lista_empresa * cabeca, char* nome_do_arquivo){
-
-    lista_empresa *atual = cabeca;
-    lista_empresa *temp = NULL;
-    FILE *pArquivo;
-
-    pArquivo = fopen(nome_do_arquivo, "wb");
-
-    if (pArquivo != NULL){
-
-        while (atual->prox != NULL){
-
-            atual = atual->prox;
-            temp = atual->prox;
-
-            atual->prox = NULL;
-
-            fwrite(atual, 1, sizeof(lista_empresa), pArquivo);
-
-            atual->prox = temp;
-
-        }
-    
-        fclose(pArquivo);
-    }
-}
-
-void carrega_acoes (lista_compra_venda *cabeca, lista_empresa *empresas, char* nome_do_arquivo) {
-
-    lista_compra_venda *temp;
-    FILE *pArquivo;
-
-
-    pArquivo = fopen(nome_do_arquivo, "rb");
-
-    if (pArquivo != NULL){
-
-        while ( fread (temp, sizeof(lista_compra_venda), 1, pArquivo) ){
-
-            inserir_lista_acoes(cabeca, empresas, temp->qtd, temp->valor, temp->sigla);
-        }
-
-        fclose(pArquivo);
-
-    }
-
-}
-
-void carrega_empresas (lista_empresa *cabeca, char* nome_do_arquivo) {
-
-    lista_empresa *atual = cabeca;
-    lista_empresa *temp;
-    FILE *pArquivo;
-
-    pArquivo = fopen(nome_do_arquivo, "rb");
-
-    if (pArquivo != NULL){
-
-        while ( fread (temp, sizeof(lista_empresa), 1, pArquivo) ){
-
-            inserir_empresa(cabeca, temp->sigla, temp->cotacao);
-        }
-
-        fclose(pArquivo);
-
-    }
-
-}
-
-int main()
-{
-    lista_empresa * empresas_listadas = inicializa_lista_empresas();
-    lista_compra_venda * lista_compra = inicializa_lista_compra_venda();
-    lista_compra_venda * lista_venda = inicializa_lista_compra_venda();
-
-    int opcao;
-    char* nome;
-    int preco = 0;
-    int qtd = 0;
-
-    carrega_empresas(empresas_listadas, "l_e");
-    carrega_acoes(lista_compra, empresas_listadas, "l_c");
-    carrega_acoes(lista_venda, empresas_listadas, "l_v");
-   
-    while (opcao){
-
-    executa_compras_vendas(lista_compra, lista_venda, empresas_listadas);
-    excluir(lista_compra, -1);
-    excluir(lista_venda, -1);
-
-    printf("1 - Inserir acao para compra\n");
-    printf("2 - Inserir acao para venda\n");
-    printf("3 - Verificar cotacoes das empresas\n");
-    printf("4 - Mostrar mercado\n");
-    printf("0 - Sair\n");
-
-    scanf("%d", &opcao);
-
-    salvar_acoes(lista_compra, "l_c");
-    salvar_acoes(lista_venda, "l_v");
-    salvar_empresas(empresas_listadas, "l_e");
-
-    Limpa_stdin();
-
-        switch (opcao)
-        {
-        case 1:
-            printf("__________________\n");
-            
-            printf("Sigla da empresa: ");
-            scanf("%5s", nome);
-
-            Limpa_stdin();
-
-            printf("Preco da acao: ");
-            scanf("%d", &preco);
-
-            Limpa_stdin();
-
-            printf("Quantidade: ");
-            scanf("%d", &qtd);
-
-            inserir_lista_acoes(lista_compra, empresas_listadas, qtd, preco, nome);
-            printf("__________________\n");
-
-            break;
-        
-        case 2:
-
-            printf("__________________\n");
-
-            printf("Sigla da empresa: ");
-            scanf("%5s", nome);
-
-            Limpa_stdin();
-
-            printf("Preco da acao: ");
-            scanf("%d", &preco);
-
-            Limpa_stdin();
-
-            printf("Quantidade: ");
-            scanf("%d", &qtd);
-            
-            inserir_lista_acoes(lista_venda, empresas_listadas, qtd, preco, nome);
-            
-            printf("__________________\n");
-
-            break;
-
-        case 3:
-
-            printf("__________________\n");
-            exibir_empresas(empresas_listadas);
-            printf("__________________\n");
-
-            break;
-
-        case 4:
-            
-            printf("__________________\n");
-            printf("Acoes de compra\n");
-            exibir_acoes(lista_compra);
-
-            
-            printf("Acoes de venda\n");
-            exibir_acoes(lista_venda);
-            printf("__________________\n");
-            break;
-
-        case 0:
-
-            break;
-
-        default:
-
-            printf("Opcao invalida\n");
-            
-            break;
-        }
-
-    }
-    
-    return 0;
+	FILE *pont_arq;//cria variável ponteiro para o arquivo
+
+	//abrindo o arquivo com tipo de abertura w
+	pont_arq = fopen("arquivo_acoes.txt", "w");
+
+	//testando a criação do arquivo
+	if(pont_arq == NULL){
+		printf("Erro na abertura do arquivo\n");
+		return 1;
+	} else{
+
+
+	t_ponto* ini_ponto;//início da lista
+	t_ponto* proximo_ponto;
+	int resp;
+	int sorte01, sorte02, atual = 0, anterior = 0, codigo = 0, codigo03 = 0, atual02 =0, anterior02 =0;
+
+	//alocação de memória
+	ini_ponto = (t_ponto *)malloc(sizeof(t_ponto));
+	if(ini_ponto == NULL)
+		exit(1);
+
+	//aponta para o mesmo endereço de ini_ponto
+	proximo_ponto = ini_ponto;
+
+	while(1){
+		printf("Digite a quantidade: \n");
+		scanf("%d", &proximo_ponto->quantidade);
+		//usando fprintf para armazenar a string no arquivo
+		fprintf(pont_arq, "%d\n", proximo_ponto->quantidade);
+
+		printf("Digite o valor: \n");
+		scanf("%f", &proximo_ponto->valor);
+		//usando fprintf para armazenar a string no arquivo
+		fprintf(pont_arq, "%d\n", proximo_ponto->valor);
+
+		do{
+			printf("Qual o tipo? <2> COMPRA <3> VENDA: \n");
+			scanf("%d", &sorte01);
+			//usando fprintf para armazenar a string no arquivo
+			fprintf(pont_arq, "%d\n", sorte01);
+
+
+			proximo_ponto->tipo = sorte01;
+
+		}while(sorte01 !=2 && sorte01 != 3);
+		
+
+		do{
+			printf("Digite a sigla: <4> PETR4 <5> VALE5 <6> ITSA4 <7> USIM5 <8> LAME3 \n");
+			scanf("%d", &sorte02); 
+			//usando fprintf para armazenar a string no arquivo
+			fprintf(pont_arq, "%d\n", sorte02);
+
+			proximo_ponto->sigla = sorte02;
+
+		}while(sorte02 !=4 && sorte02 != 5 && sorte02 != 6 && sorte02 != 7 && sorte02 != 8);
+		
+
+		printf("Deseja continuar? <1> SIM <outro valor> NAO: \n");
+		scanf("%d", &resp);
+
+		if(resp == 1){
+			proximo_ponto->proximo = (t_ponto*)malloc(sizeof(t_ponto));
+			proximo_ponto = proximo_ponto->proximo;
+		}else
+			break;
+		}
+
+		printf("\n");
+		proximo_ponto->proximo = NULL;
+		proximo_ponto = ini_ponto;
+
+		while(proximo_ponto != NULL){
+			printf("Quantidade: %d, Valor: %.2f, ", proximo_ponto->quantidade, proximo_ponto->valor);
+
+			//verificando igualdade de valores
+			if(codigo == 0){
+				atual = proximo_ponto->valor;
+				
+			}
+
+			int codigo02 = 0;
+			if(codigo02 == 0 && codigo > 0){
+				anterior = proximo_ponto->valor;				
+			}
+
+			codigo++;
+			
+
+			if(proximo_ponto->tipo == 2){
+				printf("Tipo: Compra, ");
+			}else{
+				printf("Tipo: Venda, ");
+			}
+
+			//comparando a quantidade
+			if(codigo03 == 0){
+				atual02 = proximo_ponto->quantidade;
+				
+			}
+
+			int codigo04 = 0;
+			if(codigo04 == 0 && codigo03 > 0){
+				anterior02 = proximo_ponto->quantidade;				
+			}
+
+			codigo03++;
+			
+
+			if(proximo_ponto->tipo == 2){
+				printf("Tipo: Compra, ");
+			}else{
+				printf("Tipo: Venda, ");
+			}
+
+			//<4> PETR4 <5> VALE5 <6> ITSA4 <7> USIM5 <8> LAME3
+
+			if(proximo_ponto->sigla == 4){
+				printf("Sigla: PETR4\n");
+			}else if(proximo_ponto->sigla == 5){
+				printf("Sigla: VALE5\n");
+			}else if(proximo_ponto->sigla == 6){
+				printf("Sigla: ITSA4\n");
+			}else if(proximo_ponto->sigla == 7){
+				printf("Sigla: USIM5\n");
+			}else if(proximo_ponto->sigla == 8){
+				printf("Sigla: LAME3\n");
+			}
+
+			
+			proximo_ponto = proximo_ponto->proximo;
+
+			if (anterior != atual && anterior02 == atual02 && proximo_ponto == NULL)
+			{
+				printf("\n");				
+				printf("Desculpa, a operacao nao pode ser realizada. \n");
+				printf("ValorVenda deve ser igual ao de ValorCompra\n");
+				printf("Quantidade de venda ou compra deve ser menor das duas quanitdades\n");
+			} else if (anterior == atual && anterior02 == atual02 && proximo_ponto == NULL){
+			
+				printf("\n");				
+				printf("Desculpa, a operacao nao pode ser realizada. \n");				
+				printf("Quantidade de venda ou compra deve ser menor das duas quantidades\n");
+			}else if (anterior == atual && anterior02 != atual02 && proximo_ponto == NULL){
+				printf("\n");
+				printf("Operacao realizada com sucesso!!!\n");
+			}
+			
+		}
+
+		fclose(pont_arq);
+
+
+	}
+
+
+
+	
+	return 0;
 }
