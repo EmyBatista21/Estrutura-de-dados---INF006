@@ -49,7 +49,7 @@ int main(void) {
             }
             i++;
             if (ini_compra == NULL)
-              exite(1);
+              exit(1);
             prox_compra = ini_compra;
             inserir_Compras(&ini_compra, &prox_compra);
             limparComPause();
@@ -89,6 +89,7 @@ int main(void) {
 }
 
 int menuPrincipal(){
+  int opPrincipal;
   printf("Digite a opção que deseja\n");
   printf("(1) - Oferta de compra\n");
   printf("(2) - Oferta de venda\n");
@@ -101,6 +102,7 @@ int menuPrincipal(){
 }
 
 int menuCompras(){
+  int opCompra; 
   printf("(1) - Inserir oferta de compra\n");
   printf("(2) - Listar ofertas de compra\n");
   printf("(3) - Voltar\n");
